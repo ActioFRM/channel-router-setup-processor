@@ -6,9 +6,23 @@ import { CustomerCreditTransferInitiation } from '../classes/iPain001Transaction
 import { NetworkMap, Rule, Typology } from '../classes/network-map';
 import { FlowFileReply, FlowFileRequest } from '../models/nifi_pb';
 import { sendUnaryData } from '@grpc/grpc-js';
+import { ArangoDBService } from '../helpers/arango-client.service';
+
+const arangodb = new ArangoDBService();
 
 export const handleTransaction = async (req: CustomerCreditTransferInitiation, callback: sendUnaryData<FlowFileReply>) => {
-  const networkMap = Object.assign(new NetworkMap(), JSON.parse(config.networkMap)) as NetworkMap;
+  
+  const networkConfigurationQuery = `
+        FOR doc IN networkConfiguration
+        RETURN doc
+      `;
+
+    const networkConfigurationList = await arangodb.query(
+      networkConfigurationQuery,
+    );
+
+    const networkMap: NetworkMap = networkConfigurationList[0];
+
   // Deduplicate all rules
   const transactionType = 'pain.001.001.11';
   const rules = getRuleMap(networkMap, transactionType);
@@ -30,7 +44,6 @@ export const handleTransaction = async (req: CustomerCreditTransferInitiation, c
 };
 
 const sendRule = async (rule: Rule, req: CustomerCreditTransferInitiation) => {
-  const ruleEndpoint = `${config.ruleEndpoint}/${rule.rule_name}/${rule.rule_version}`; // rule.ruleEndpoint;
   // const ruleRequest: RuleRequest = new RuleRequest(req, rule.typologies);
   const toSend = `{"transaction":${JSON.stringify(req)}, "typologies":${JSON.stringify(rule.typologies)}}`;
 
@@ -40,7 +53,7 @@ const sendRule = async (rule: Rule, req: CustomerCreditTransferInitiation) => {
   // ruleRequest.setContent(objJsonB64);
   // ruleEngineService.send(ruleRequest);
 
-  await executePost(ruleEndpoint, toSend);
+  await executePost(rule.rule_host, toSend);
 };
 
 // Submit the score to the Rule Engine
