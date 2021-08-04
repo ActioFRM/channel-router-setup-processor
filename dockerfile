@@ -57,6 +57,11 @@ ENV APM_SECRET_TOKEN=
 ENV NODE_ENV=prod
 ENV LOGSTASH_HOST=my-release-logstash.frm-meshed
 ENV LOGSTASH_PORT=8080
+ENV DB_URL=http://arango.frm:8529
+ENV DB_NAME=networkmap
+ENV DB_USER=root
+ENV DB_PASSWORD=123456
+ENV RULE_ENDPOINT=http://gateway.frm:8080/function/
 
 ENV prefix_logs="false"
 
