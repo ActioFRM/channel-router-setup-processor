@@ -3,11 +3,16 @@ export interface IConfig {
   redisAuth: string;
   redisHost: string;
   redisPort: number;
+  dbURL: string;
+  dbName: string;
+  dbUser: string;
+  dbPassword: string;
   grpcport: number;
   restPort: number;
   logstashHost: string;
   logstashPort: number;
-  networkMap: string;
+  arangoHost: string;
+  arangoPort: number;
   functionName: string;
   ruleEndpoint: string;
   apmLogging: boolean;
