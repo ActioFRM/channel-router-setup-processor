@@ -1,31 +1,30 @@
 import http from 'http';
-import { forkJoin } from 'rxjs';
-import { config } from '../config';
 import { LoggerService } from './logger.service';
 import { CustomerCreditTransferInitiation } from '../classes/iPain001Transaction';
 import { NetworkMap, Rule, Typology } from '../classes/network-map';
 import { FlowFileReply, FlowFileRequest } from '../models/nifi_pb';
 import { sendUnaryData } from '@grpc/grpc-js';
 import { ArangoDBService } from '../helpers/arango-client.service';
+import { ruleEngineService } from '../clients/rule-engine.client';
 
 const arangodb = new ArangoDBService();
 
 export const handleTransaction = async (req: CustomerCreditTransferInitiation, callback: sendUnaryData<FlowFileReply>) => {
   
   const networkConfigurationQuery = `
-        FOR doc IN networkConfiguration
-        RETURN doc
-      `;
+      FOR doc IN networkConfiguration
+      RETURN doc
+    `;
 
-    const networkConfigurationList = await arangodb.query(
-      networkConfigurationQuery,
-    );
+  const networkConfigurationList = await arangodb.query(
+    networkConfigurationQuery,
+  );
 
-    const networkMap: NetworkMap = networkConfigurationList[0];
+  const networkMap: [NetworkMap] = networkConfigurationList[0];
 
   // Deduplicate all rules
   const transactionType = 'pain.001.001.11';
-  const rules = getRuleMap(networkMap, transactionType);
+  const rules = getRuleMap(networkMap[0], transactionType);
 
   let ruleCounter = 0;
   // Send transaction to all rules
@@ -44,14 +43,12 @@ export const handleTransaction = async (req: CustomerCreditTransferInitiation, c
 };
 
 const sendRule = async (rule: Rule, req: CustomerCreditTransferInitiation) => {
-  // const ruleRequest: RuleRequest = new RuleRequest(req, rule.typologies);
   const toSend = `{"transaction":${JSON.stringify(req)}, "typologies":${JSON.stringify(rule.typologies)}}`;
 
-  // Uncomment this to send gRPC request to Rule Engines
-  // let ruleRequest = new FlowFileRequest();
+  let ruleRequest = new FlowFileRequest();
   let objJsonB64 = Buffer.from(JSON.stringify(toSend)).toString("base64");
-  // ruleRequest.setContent(objJsonB64);
-  // ruleEngineService.send(ruleRequest);
+  ruleRequest.setContent(objJsonB64);
+  ruleEngineService.send(ruleRequest);
 
   await executePost(rule.rule_host, toSend);
 };
