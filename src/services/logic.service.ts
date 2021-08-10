@@ -5,7 +5,7 @@ import { NetworkMap, Rule, Typology } from '../classes/network-map';
 import { FlowFileReply, FlowFileRequest } from '../models/nifi_pb';
 import { sendUnaryData } from '@grpc/grpc-js';
 import { ArangoDBService } from '../helpers/arango-client.service';
-import { ruleEngineService } from '../clients/rule-engine.client';
+import RuleEngineService from '../clients/rule-engine.client';
 
 const arangodb = new ArangoDBService();
 
@@ -20,18 +20,17 @@ export const handleTransaction = async (req: CustomerCreditTransferInitiation, c
     networkConfigurationQuery,
   );
 
-  const networkMap: [NetworkMap] = networkConfigurationList[0];
+  const networkMap: NetworkMap = networkConfigurationList[0][0];
 
   // Deduplicate all rules
   const transactionType = 'pain.001.001.11';
-  const rules = getRuleMap(networkMap[0], transactionType);
-
+  const rules = getRuleMap(networkMap, transactionType);
   let ruleCounter = 0;
   // Send transaction to all rules
   let promises: Array<Promise<void>> = [];
   rules.map((rule) => {
     ruleCounter++;
-    promises.push(sendRule(rule, req))
+    promises.push(sendRule(rule, networkMap, req))
   })
   await Promise.all(promises);
   const result = `${ruleCounter} rules initiated for transaction ID: ${req.PaymentInformation.CreditTransferTransactionInformation.PaymentIdentification.EndToEndIdentification}`;
@@ -42,15 +41,17 @@ export const handleTransaction = async (req: CustomerCreditTransferInitiation, c
   callback(null, res);
 };
 
-const sendRule = async (rule: Rule, req: CustomerCreditTransferInitiation) => {
-  const toSend = `{"transaction":${JSON.stringify(req)}, "typologies":${JSON.stringify(rule.typologies)}}`;
-
+const sendRule = async (rule: Rule, networkMap: NetworkMap, req: CustomerCreditTransferInitiation) => {
+  const toSend = `{"transaction":${JSON.stringify(req)}, "networkmap":${JSON.stringify(networkMap)}}`;
   let ruleRequest = new FlowFileRequest();
   let objJsonB64 = Buffer.from(JSON.stringify(toSend)).toString("base64");
   ruleRequest.setContent(objJsonB64);
-  ruleEngineService.send(ruleRequest);
+  const ruleService = new RuleEngineService();
+  const ruleClient = ruleService.client(rule.rule_host);
+  ruleService.send(ruleClient, ruleRequest);
 
-  await executePost(rule.rule_host, toSend);
+  // REST request. check later 
+  // await executePost(rule.rule_host, toSend);
 };
 
 // Submit the score to the Rule Engine
@@ -99,12 +100,7 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
               const ruleIndex = rules.findIndex(
                 (r: Rule) => `${r.rule_id}${r.rule_name}${r.rule_version}` === `${rule.rule_id}${rule.rule_name}${rule.rule_version}`,
               );
-              if (ruleIndex > -1) {
-                rules[ruleIndex].typologies.push(new Typology(typology.typology_id, typology.typology_name, typology.typology_version));
-              } else {
-                const tempTypologies = Array<Typology>();
-                tempTypologies.push(new Typology(typology.typology_id, typology.typology_name, typology.typology_version));
-                rule.typologies = tempTypologies;
+              if (ruleIndex < 0) {
                 rules.push(rule);
               }
             }
