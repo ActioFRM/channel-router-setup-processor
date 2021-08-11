@@ -1,4 +1,3 @@
-import bodyParser from 'koa-bodyparser';
 import { config } from './config';
 import apm from 'elastic-apm-node';
 import { Server, ServerCredentials } from '@grpc/grpc-js';

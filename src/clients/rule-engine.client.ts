@@ -6,13 +6,9 @@ import { FlowFileReply, FlowFileRequest } from '../models/nifi_pb';
  * gRPC Rule Engine Client Service
  */
 class RuleEngineService {
-
   public client(ruleHost: string): FlowFileServiceClient {
-    return new FlowFileServiceClient(
-      ruleHost,
-      credentials.createInsecure(),
-    )
-  };
+    return new FlowFileServiceClient(ruleHost, credentials.createInsecure());
+  }
 
   public async send(client: FlowFileServiceClient, param: FlowFileRequest, metadata: Metadata = new Metadata()): Promise<FlowFileReply> {
     return new Promise((resolve: Resolve<FlowFileReply>, reject: Reject): void => {
