@@ -5,6 +5,7 @@ import { IFlowFileServiceServer, FlowFileServiceService } from '../models/nifi_g
 import { FlowFileReply, FlowFileRequest } from '../models/nifi_pb';
 import { LoggerService } from '../services/logger.service';
 import { handleTransaction } from '../services/logic.service';
+import apm from 'elastic-apm-node';
 
 /**
  * gRPC Health Check
@@ -14,21 +15,28 @@ class Execute implements IFlowFileServiceServer {
   [method: string]: UntypedHandleCall;
 
   public async send(call: ServerUnaryCall<FlowFileRequest, FlowFileReply>, callback: sendUnaryData<FlowFileReply>): Promise<void> {
+    const span = apm.startSpan('execute');
     const res: FlowFileReply = new FlowFileReply();
 
     let request!: CustomerCreditTransferInitiation;
     LoggerService.log('Start - Handle execute request');
+
     try {
       const reqData = Buffer.from(call.request.getContent_asB64(), 'base64').toString();
+
       LoggerService.log(`gRPC string request received with data: ${reqData ?? ''}`);
+
       request = new CustomerCreditTransferInitiation(JSON.parse(reqData));
     } catch (parseError) {
       const failMessage = 'Failed to parse execution request.';
+
       LoggerService.error(failMessage, parseError, 'ApplicationService');
       LoggerService.log('End - Handle execute request');
+
       res.setResponsecode(0);
       res.setBody(failMessage);
       callback(null, res);
+
       return;
     }
 
@@ -44,6 +52,8 @@ class Execute implements IFlowFileServiceServer {
     } finally {
       LoggerService.log('End - Handle execute request');
     }
+
+    span?.end();
   }
 }
 
