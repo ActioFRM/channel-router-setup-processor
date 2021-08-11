@@ -61,7 +61,7 @@ ENV NODE_ENV=prod
 ENV LOGSTASH_HOST=my-release-logstash.frm-meshed
 ENV LOGSTASH_PORT=8080
 
-ENV DB_URL=http://arango.frm:8529
+ENV DB_URL=http://arangodb.frm:8529
 ENV DB_NAME=networkmap
 ENV DB_USER=root
 ENV DB_PASSWORD=123456
