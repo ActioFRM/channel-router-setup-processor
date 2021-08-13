@@ -3,7 +3,7 @@ export class Rule {
   rule_id = '';
   rule_name = '';
   rule_version = '';
-  rule_host = ''
+  rule_host = '';
   typologies: Array<Typology> = [];
 
   getStrValue(): string {
