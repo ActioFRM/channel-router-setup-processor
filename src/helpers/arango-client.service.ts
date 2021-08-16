@@ -30,11 +30,7 @@ export class ArangoDBService {
 
       return results;
     } catch (error) {
-      LoggerService.error(
-        'Error while executing query from arango with message:',
-        error,
-        'ArangoDBService',
-      );
+      LoggerService.error('Error while executing query from arango with message:', error as any, 'ArangoDBService');
     }
   }
 }
