@@ -73,7 +73,10 @@ class EquivalentAmount {
   Amount = 0; // amount
 }
 
-class ActiveOrHistoricCurrencyAndAmount {}
+class ActiveOrHistoricCurrencyAndAmount {
+  Currency = ''; // currency
+  Amount = 0; // amount
+}
 
 class Amount {
   InstructedAmount: ActiveOrHistoricCurrencyAndAmount = new ActiveOrHistoricCurrencyAndAmount();
