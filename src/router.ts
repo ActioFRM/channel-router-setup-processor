@@ -1,9 +1,11 @@
 import Router from 'koa-router';
-import { healthCheck } from './controllers/healthcheck';
+import { execute } from './controllers/executeController';
+import { healthCheck } from './controllers/healthCheckController';
 
 const router = new Router();
 
 // health checks
 router.get('/health', healthCheck);
+router.post('/execute', execute);
 
 export default router;
