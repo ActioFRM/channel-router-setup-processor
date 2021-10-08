@@ -19,8 +19,9 @@ export const runServer = async (): Promise<void> => {
    * KOA Rest Server
    */
   const app = new App();
-
-  LoggerService.log(`HTTP Server listening on port ${config.restPort}`);
+  app.listen(config.restPort, () => {
+    LoggerService.log(`HTTP Server listening on port ${config.restPort}`);
+  });
 };
 
 process.on('uncaughtException', (err) => {

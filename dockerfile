@@ -11,8 +11,6 @@ RUN addgroup -S app && adduser -S -g app app
 
 RUN apk --no-cache add curl ca-certificates
 
-RUN apk add --no-cache -t build-dependencies git make gcc g++ python libtool autoconf automake yarn
-
 # Turn down the verbosity to default level.
 ENV NPM_CONFIG_LOGLEVEL warn
 
@@ -23,7 +21,7 @@ RUN mkdir -p /home/app
 WORKDIR /home/app
 
 COPY ./package.json ./
-COPY ./yarn.lock ./
+COPY ./package-lock.json ./
 COPY ./tsconfig.json ./
 COPY ./global.d.ts ./
 
@@ -31,12 +29,12 @@ COPY ./global.d.ts ./
 # RUN yarn run cleanup
 
 # Install dependencies
-RUN yarn install
+RUN npm install
 
 COPY ./src ./src
 
 # Build the project
-RUN yarn run build
+RUN npm run build
 
 # Environment variables for openfaas
 ENV cgi_headers="true"
@@ -49,22 +47,21 @@ ENV write_timeout="15s"
 ENV read_timeout="15s"
 
 ENV REST_PORT=3000
-ENV GRPC_PORT=50051
 ENV FUNCTION_NAME=channel-router-setup-processor
 
-ENV APM_LOGGING=true
+ENV APM_LOGGING=false
 ENV APM_SERVICE_NAME=channel-router-setup-processor
-ENV APM_URL=http://apm-server-apm-server.frm:8200
+ENV APM_URL=http://apm-server.development:8200
 ENV APM_SECRET_TOKEN=
-ENV NODE_ENV=prod
+ENV NODE_ENV=production
 
-ENV LOGSTASH_HOST=my-release-logstash.frm-meshed
+ENV LOGSTASH_HOST=logstash.development
 ENV LOGSTASH_PORT=8080
 
-ENV DB_URL=http://arangodb.frm:8529
+ENV DB_URL=http://arango.development:8529
 ENV DB_NAME=networkmap
 ENV DB_USER=root
-ENV DB_PASSWORD=123456
+ENV DB_PASSWORD='$!prAtHe>Qh5X9D3'
 ENV RULE_ENDPOINT=http://gateway.frm:8080/function/
 
 ENV prefix_logs="false"

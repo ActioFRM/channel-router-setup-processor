@@ -16,7 +16,7 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
           if (typology.rules && typology.rules.length > 0)
             for (const rule of typology.rules) {
               const ruleIndex = rules.findIndex(
-                (r: Rule) => `${r.rule_id}${r.rule_name}${r.rule_version}` === `${rule.rule_id}${rule.rule_name}${rule.rule_version}`,
+                (r: Rule) => `${r.id}${r.rule_name}${r.rule_version}` === `${rule.id}${rule.rule_name}${rule.rule_version}`,
               );
               if (ruleIndex < 0) {
                 rules.push(rule);
@@ -54,10 +54,10 @@ export const handleTransaction = async (req: CustomerCreditTransferInitiation): 
 };
 
 const sendRule = async (rule: Rule, networkMap: NetworkMap, req: CustomerCreditTransferInitiation) => {
-  const toSend = `{"transaction":${JSON.stringify(req)}, "networkmap":${JSON.stringify(networkMap)}}`;
+  const toSend = { transaction: req, networkMap: networkMap };
   const ruleRes = await axios.post(rule.rule_host, toSend);
   if (ruleRes.status !== 200) {
-    LoggerService.trace(`Error status ${ruleRes.status} from Rule ${rule.rule_id}, with message:\r\n${ruleRes.data}`);
+    LoggerService.trace(`Error status ${ruleRes.status} from Rule ${rule.id}, with message:\r\n${ruleRes.data}`);
     LoggerService.trace(`Request:\r\n${toSend}`);
   }
 };

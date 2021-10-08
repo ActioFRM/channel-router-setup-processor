@@ -8,8 +8,8 @@ export const execute = async (ctx: Context, next: Next): Promise<void | Context>
   LoggerService.log('Start - Handle execute request');
 
   try {
-    const reqBody = ctx.request.rawBody ?? JSON.parse('');
-    request = new CustomerCreditTransferInitiation(JSON.parse(reqBody));
+    const reqBody = ctx.request.body;
+    request = new CustomerCreditTransferInitiation(reqBody);
   } catch (parseError) {
     const failMessage = 'Failed to parse execution request.';
     LoggerService.error(failMessage, parseError, 'ApplicationService');
@@ -20,7 +20,10 @@ export const execute = async (ctx: Context, next: Next): Promise<void | Context>
   }
 
   try {
-    await handleTransaction(request);
+    const crspResp = await handleTransaction(request);
+    ctx.status = 200;
+    ctx.body = crspResp;
+    return ctx;
   } catch (err) {
     const failMessage = 'Error while handling transaction.';
     LoggerService.error(failMessage, err, 'ApplicationService');
