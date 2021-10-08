@@ -24,6 +24,7 @@
     "./src/**/*.spec.ts",
     "./src/jest.setup.redis-mock.js",
     "build",
+    "template",
     "templates",
     "__tests__"
   ]
