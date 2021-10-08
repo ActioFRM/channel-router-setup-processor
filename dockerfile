@@ -61,7 +61,7 @@ ENV LOGSTASH_PORT=8080
 ENV DB_URL=http://arango.development:8529
 ENV DB_NAME=networkmap
 ENV DB_USER=root
-ENV DB_PASSWORD='$!prAtHe>Qh5X9D3'
+ENV DB_PASSWORD=
 ENV RULE_ENDPOINT=http://gateway.frm:8080/function/
 
 ENV prefix_logs="false"
