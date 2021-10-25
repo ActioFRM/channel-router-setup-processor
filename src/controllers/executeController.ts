@@ -1,15 +1,15 @@
 import { Context, Next } from 'koa';
-import { CustomerCreditTransferInitiation } from '../classes/iPain001Transaction';
+import { IPain001Message } from '../classes/iPain001';
 import { LoggerService } from '../services/logger.service';
 import { handleTransaction } from '../services/logic.service';
 
 export const execute = async (ctx: Context, next: Next): Promise<void | Context> => {
-  let request!: CustomerCreditTransferInitiation;
+  let request!: IPain001Message;
   LoggerService.log('Start - Handle execute request');
 
   try {
     const reqBody = ctx.request.body;
-    request = new CustomerCreditTransferInitiation(reqBody);
+    request = Object.assign(new IPain001Message(), reqBody);
   } catch (parseError) {
     const failMessage = 'Failed to parse execution request.';
     LoggerService.error(failMessage, parseError, 'ApplicationService');

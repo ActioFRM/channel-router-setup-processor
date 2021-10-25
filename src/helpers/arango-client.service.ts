@@ -35,7 +35,7 @@ export class ArangoDBService implements iDBService {
 
       const results = await cycles.batches.all();
 
-      LoggerService.log(`Query result: ${JSON.stringify(results)}`);
+      // LoggerService.log(`Query result: ${JSON.stringify(results)}`);
 
       return results;
     } catch (error) {
