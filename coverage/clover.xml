@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1635255936118" clover="3.2.0">
-  <project timestamp="1635255936118" name="All files">
+<coverage generated="1635256789888" clover="3.2.0">
+  <project timestamp="1635256789888" name="All files">
     <metrics statements="80" coveredstatements="80" conditionals="15" coveredconditionals="14" methods="3" coveredmethods="3" elements="98" coveredelements="97" complexity="0" loc="80" ncloc="80" packages="1" files="1" classes="1"/>
     <file name="logic.service.ts" path="/Users/theo/Projects/Work/lextego/frm/channel-router-setup-processor/src/services/logic.service.ts">
       <metrics statements="80" coveredstatements="80" conditionals="15" coveredconditionals="14" methods="3" coveredmethods="3"/>
