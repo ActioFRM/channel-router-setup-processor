@@ -35,7 +35,7 @@ export const handleTransaction = async (req: IPain001Message) => {
     // Deduplicate all rules
     const transactionType = 'pain.001.001.11';
     const rules = getRuleMap(networkMap, transactionType);
-    let ruleCounter = 0;
+    const ruleCounter = 0;
 
     // Prune NetworkMap
     let networkSubMap: NetworkMap;
@@ -45,19 +45,21 @@ export const handleTransaction = async (req: IPain001Message) => {
 
       // Send transaction to all rules
       const promises: Array<Promise<void>> = [];
+      const failedRules: Array<string> = [];
+      const sentTo: Array<string> = [];
 
       for (const rule of rules) {
-        ruleCounter++;
-        promises.push(sendRuleToRuleProcessor(rule, networkSubMap, req));
+        promises.push(sendRuleToRuleProcessor(rule, networkSubMap, req, sentTo, failedRules));
       }
       await Promise.all(promises);
 
-      const message = `${ruleCounter} rules initiated for transaction ID: ${req.CstmrCdtTrfInitn.PmtInf.PmtInfId}`;
       const result = {
-        networkMap: networkSubMap,
+        rulesSentTo: sentTo,
+        failedToSend: failedRules,
         transaction: req,
+        networkMap: networkSubMap,
       };
-      LoggerService.log(message);
+      // LoggerService.log(rulesExecuted);
       return result;
     }
   } else {
@@ -70,11 +72,22 @@ export const handleTransaction = async (req: IPain001Message) => {
   }
 };
 
-const sendRuleToRuleProcessor = async (rule: Rule, networkMap: NetworkMap, req: IPain001Message) => {
+const sendRuleToRuleProcessor = async (
+  rule: Rule,
+  networkMap: NetworkMap,
+  req: IPain001Message,
+  sentTo: Array<string>,
+  failedRules: Array<string>,
+) => {
   const toSend = { transaction: req, networkMap };
-  const ruleRes = await axios.post(`${rule.host}/execute`, toSend);
-  if (ruleRes.status !== 200) {
-    LoggerService.trace(`Error status ${ruleRes.status} from Rule ${rule.id}, with message:\r\n${ruleRes.data}`);
-    LoggerService.trace(`Request:\r\n${toSend}`);
+  try {
+    const ruleRes = await axios.post(`${rule.host}/execute`, toSend);
+    if (ruleRes.status === 200) {
+      sentTo.push(rule.id);
+      LoggerService.log(`Successfully sent to ${rule.id}`);
+    }
+  } catch (error) {
+    failedRules.push(rule.id);
+    LoggerService.trace(`Failed to send to Rule ${rule.id}`);
   }
 };
