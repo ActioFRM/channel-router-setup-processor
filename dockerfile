@@ -50,17 +50,17 @@ ENV REST_PORT=3000
 ENV FUNCTION_NAME=channel-router-setup-processor
 
 ENV APM_LOGGING=true
-ENV APM_SERVICE_NAME=
+ENV APM_SERVICE_NAME=channel-router-setup-processor
 ENV APM_URL=
 ENV APM_SECRET_TOKEN=
 ENV NODE_ENV=production
 
-ENV LOGSTASH_HOST=logstash.development
-ENV LOGSTASH_PORT=8080
+ENV LOGSTASH_HOST=
+ENV LOGSTASH_PORT=
 
 ENV DB_URL=
 ENV DB_NAME=networkmap
-ENV DB_USER=
+ENV DB_USER=root
 ENV DB_PASSWORD=
 
 ENV prefix_logs="false"
