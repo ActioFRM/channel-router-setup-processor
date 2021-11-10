@@ -26,9 +26,6 @@ COPY ./tsconfig.json ./
 COPY ./global.d.ts ./
 
 # Install dependencies
-# RUN yarn run cleanup
-
-# Install dependencies
 RUN npm install
 
 COPY ./src ./src
@@ -56,7 +53,7 @@ ENV APM_SECRET_TOKEN=
 ENV NODE_ENV=production
 
 ENV LOGSTASH_HOST=
-ENV LOGSTASH_PORT=
+ENV LOGSTASH_PORT=8080
 
 ENV DB_URL=
 ENV DB_NAME=networkmap

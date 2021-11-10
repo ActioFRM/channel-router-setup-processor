@@ -62,6 +62,8 @@ export const handleTransaction = async (req: IPain001Message) => {
     } else {
       LoggerService.log('No coresponding message found in Network map');
       const result = {
+        rulesSentTo: [],
+        failedToSend: [],
         networkMap: {},
         transaction: req,
       };
@@ -70,6 +72,8 @@ export const handleTransaction = async (req: IPain001Message) => {
   } else {
     LoggerService.log('No network map found in DB');
     const result = {
+      rulesSentTo: [],
+      failedToSend: [],
       networkMap: {},
       transaction: req,
     };
