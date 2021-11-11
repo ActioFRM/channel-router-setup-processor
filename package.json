@@ -5,14 +5,15 @@
   "main": "src/index.ts",
   "types": "build/index.d.ts",
   "scripts": {
+    "dev": "nodemon",
     "build": "tsc --project tsconfig.json",
-    "cleanup": "rm -rf build template jest.config.js jest.config.js.map node_modules yarn.lock",
+    "cleanup": "rm -rf build template jest.config.js jest.config.js.map node_modules",
     "start": "node build/index",
     "start:dev": "env $(cat .env.template) nodemon",
-    "fix": "yarn fix:prettier && yarn fix:eslint",
+    "fix": "npm run fix:prettier && npm run fix:eslint",
     "fix:eslint": "eslint --fix \"**/*.ts\"",
     "fix:prettier": "prettier --write \"**/*.ts\"",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint": "npm lint:eslint && npm lint:prettier",
     "lint:eslint": "eslint \"**/*.ts\"",
     "lint:prettier": "prettier --check \"**/*.ts\"",
     "test": "jest --config=jest.config.ts --passWithNoTests",
@@ -22,6 +23,9 @@
   "contributors": [
     {
       "name": "Johan Foley"
+    },
+    {
+      "name": "Theophilus Okwugwuni"
     }
   ],
   "license": "ISC",
@@ -37,10 +41,7 @@
     "koa": "2.13.1",
     "koa-bodyparser": "4.3.0",
     "koa-router": "10.0.0",
-    "log4js": "^6.3.0",
-    "redis": "^3.0.2",
-    "shelljs": "^0.8.4",
-    "swagger2-koa": "^3.0.0"
+    "log4js": "^6.3.0"
   },
   "devDependencies": {
     "@types/elastic-apm-node": "^2.7.0",

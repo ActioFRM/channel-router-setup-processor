@@ -1,5 +1,5 @@
 import { LoggerService } from './logger.service';
-import { CustomerCreditTransferInitiation } from '../classes/iPain001Transaction';
+import { IPain001Message } from '../classes/iPain001';
 import { NetworkMap, Rule } from '../classes/network-map';
 import axios from 'axios';
 import { dbService } from '..';
@@ -7,7 +7,7 @@ import { dbService } from '..';
 function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   const rules: Rule[] = new Array<Rule>();
 
-  const painChannel = networkMap.transactions.find((tran) => tran.transaction_type === transactionType);
+  const painChannel = networkMap.messages.find((tran) => tran.txTp === transactionType);
 
   if (painChannel && painChannel.channels && painChannel.channels.length > 0) {
     for (const channel of painChannel.channels) {
@@ -15,9 +15,7 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
         for (const typology of channel.typologies) {
           if (typology.rules && typology.rules.length > 0)
             for (const rule of typology.rules) {
-              const ruleIndex = rules.findIndex(
-                (r: Rule) => `${r.id}${r.rule_name}${r.rule_version}` === `${rule.id}${rule.rule_name}${rule.rule_version}`,
-              );
+              const ruleIndex = rules.findIndex((r: Rule) => `${r.id}` === `${rule.id}`);
               if (ruleIndex < 0) {
                 rules.push(rule);
               }
@@ -29,35 +27,76 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   return rules;
 }
 
-export const handleTransaction = async (req: CustomerCreditTransferInitiation): Promise<string> => {
+export const handleTransaction = async (req: IPain001Message) => {
   // Fetch the network map
   const networkConfigurationList = await dbService.getNetworkMap();
-  const networkMap: NetworkMap = networkConfigurationList[0][0];
+  if (networkConfigurationList && networkConfigurationList[0]) {
+    const networkMap: NetworkMap = networkConfigurationList[0][0];
 
-  // Deduplicate all rules
-  const transactionType = 'pain.001.001.11';
-  const rules = getRuleMap(networkMap, transactionType);
-  let ruleCounter = 0;
+    // Prune NetworkMap
+    let networkSubMap: NetworkMap;
+    const prunedMap = networkMap.messages.filter((msg) => msg.txTp === req.TxTp);
+    if (prunedMap && prunedMap[0]) {
+      networkSubMap = Object.assign(new NetworkMap(), { messages: prunedMap });
 
-  // Send transaction to all rules
-  const promises: Array<Promise<void>> = [];
+      // Deduplicate all rules
+      const rules = getRuleMap(networkMap, req.TxTp);
 
-  for (const rule of rules) {
-    ruleCounter++;
-    promises.push(sendRule(rule, networkMap, req));
+      // Send transaction to all rules
+      const promises: Array<Promise<void>> = [];
+      const failedRules: Array<string> = [];
+      const sentTo: Array<string> = [];
+
+      for (const rule of rules) {
+        promises.push(sendRuleToRuleProcessor(rule, networkSubMap, req, sentTo, failedRules));
+      }
+      await Promise.all(promises);
+
+      const result = {
+        rulesSentTo: sentTo,
+        failedToSend: failedRules,
+        transaction: req,
+        networkMap: networkSubMap,
+      };
+      return result;
+    } else {
+      LoggerService.log('No coresponding message found in Network map');
+      const result = {
+        rulesSentTo: [],
+        failedToSend: [],
+        networkMap: {},
+        transaction: req,
+      };
+      return result;
+    }
+  } else {
+    LoggerService.log('No network map found in DB');
+    const result = {
+      rulesSentTo: [],
+      failedToSend: [],
+      networkMap: {},
+      transaction: req,
+    };
+    return result;
   }
-  await Promise.all(promises);
-
-  const result = `${ruleCounter} rules initiated for transaction ID: ${req.PaymentInformation.CreditTransferTransactionInformation.PaymentIdentification.EndToEndIdentification}`;
-  LoggerService.log(result);
-  return result;
 };
 
-const sendRule = async (rule: Rule, networkMap: NetworkMap, req: CustomerCreditTransferInitiation) => {
-  const toSend = { transaction: req, networkMap: networkMap };
-  const ruleRes = await axios.post(rule.rule_host, toSend);
-  if (ruleRes.status !== 200) {
-    LoggerService.trace(`Error status ${ruleRes.status} from Rule ${rule.id}, with message:\r\n${ruleRes.data}`);
-    LoggerService.trace(`Request:\r\n${toSend}`);
+const sendRuleToRuleProcessor = async (
+  rule: Rule,
+  networkMap: NetworkMap,
+  req: IPain001Message,
+  sentTo: Array<string>,
+  failedRules: Array<string>,
+) => {
+  const toSend = { transaction: req, networkMap };
+  try {
+    const ruleRes = await axios.post(`${rule.host}/execute`, toSend);
+    if (ruleRes.status === 200) {
+      sentTo.push(rule.id);
+      LoggerService.log(`Successfully sent to ${rule.id}`);
+    }
+  } catch (error) {
+    failedRules.push(rule.id);
+    LoggerService.trace(`Failed to send to Rule ${rule.id}`);
   }
 };

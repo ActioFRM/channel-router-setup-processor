@@ -13,6 +13,7 @@ if (config.apmLogging) {
     usePathAsTransactionName: true,
   });
 }
+export const app = new App();
 
 export const runServer = async (): Promise<void> => {
   /**
@@ -37,4 +38,5 @@ try {
 } catch (err) {
   LoggerService.error('Error while starting gRPC server', err);
 }
+
 export const dbService: iDBService = new ArangoDBService();

@@ -26,9 +26,6 @@ COPY ./tsconfig.json ./
 COPY ./global.d.ts ./
 
 # Install dependencies
-# RUN yarn run cleanup
-
-# Install dependencies
 RUN npm install
 
 COPY ./src ./src
@@ -49,20 +46,19 @@ ENV read_timeout="15s"
 ENV REST_PORT=3000
 ENV FUNCTION_NAME=channel-router-setup-processor
 
-ENV APM_LOGGING=false
+ENV APM_LOGGING=true
 ENV APM_SERVICE_NAME=channel-router-setup-processor
-ENV APM_URL=http://apm-server.development:8200
+ENV APM_URL=
 ENV APM_SECRET_TOKEN=
 ENV NODE_ENV=production
 
-ENV LOGSTASH_HOST=logstash.development
+ENV LOGSTASH_HOST=
 ENV LOGSTASH_PORT=8080
 
-ENV DB_URL=http://arango.development:8529
+ENV DB_URL=
 ENV DB_NAME=networkmap
 ENV DB_USER=root
 ENV DB_PASSWORD=
-ENV RULE_ENDPOINT=http://gateway.frm:8080/function/
 
 ENV prefix_logs="false"
 
