@@ -1,5 +1,5 @@
 import { config } from '../config';
-import log4js, { Log4js } from 'log4js';
+import log4js from 'log4js';
 
 if (config.nodeEnv !== 'dev' && config.nodeEnv !== 'test') {
   log4js.configure({

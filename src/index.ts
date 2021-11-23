@@ -11,6 +11,8 @@ if (config.apmLogging) {
     secretToken: config.apmSecretToken,
     serverUrl: config.apmURL,
     usePathAsTransactionName: true,
+    active: config.apmLogging,
+    transactionIgnoreUrls: ['/health'],
   });
 }
 export const app = new App();
