@@ -23,6 +23,7 @@ WORKDIR /home/app
 COPY ./package.json ./
 COPY ./package-lock.json ./
 COPY ./tsconfig.json ./
+COPY ./global.d.ts ./
 
 # Install dependencies
 RUN npm install
@@ -53,7 +54,7 @@ ENV APM_LOGGING=true
 ENV APM_URL=http://apm-server.development:8200
 ENV APM_SECRET_TOKEN=
 
-ENV LOGSTASH_HOST="logstash.development:8080"
+ENV LOGSTASH_HOST=logstash.development
 ENV LOGSTASH_PORT=8080
 
 ENV DB_URL=http://arango.development:8529
