@@ -1,5 +1,4 @@
 import { LoggerService } from './logger.service';
-import { IPain001Message } from '../classes/iPain001';
 import { NetworkMap, Rule } from '../classes/network-map';
 import axios from 'axios';
 import { dbService } from '..';
@@ -7,10 +6,10 @@ import { dbService } from '..';
 function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   const rules: Rule[] = new Array<Rule>();
 
-  const painChannel = networkMap.messages.find((tran) => tran.txTp === transactionType);
+  const MessageChannel = networkMap.messages.find((tran) => tran.txTp === transactionType);
 
-  if (painChannel && painChannel.channels && painChannel.channels.length > 0) {
-    for (const channel of painChannel.channels) {
+  if (MessageChannel && MessageChannel.channels && MessageChannel.channels.length > 0) {
+    for (const channel of MessageChannel.channels) {
       if (channel.typologies && channel.typologies.length > 0)
         for (const typology of channel.typologies) {
           if (typology.rules && typology.rules.length > 0)
@@ -27,7 +26,7 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   return rules;
 }
 
-export const handleTransaction = async (req: IPain001Message) => {
+export const handleTransaction = async (req:any) => {
   // Fetch the network map
   const networkConfigurationList = await dbService.getNetworkMap();
   if (networkConfigurationList && networkConfigurationList[0]) {
@@ -84,7 +83,7 @@ export const handleTransaction = async (req: IPain001Message) => {
 const sendRuleToRuleProcessor = async (
   rule: Rule,
   networkMap: NetworkMap,
-  req: IPain001Message,
+  req: any,
   sentTo: Array<string>,
   failedRules: Array<string>,
 ) => {

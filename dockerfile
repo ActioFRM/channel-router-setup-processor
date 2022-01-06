@@ -45,13 +45,14 @@ ENV read_timeout="15s"
 
 ENV prefix_logs="false"
 
-ENV REST_PORT=3000
 ENV FUNCTION_NAME=channel-router-setup-processor
+ENV NODE_ENV="production"
+ENV REST_PORT=3000
+ENV LOGSTASH_URL=logstash.development:8080
 
 ENV APM_LOGGING=true
 ENV APM_URL=http://apm-server.development:8200
 ENV APM_SECRET_TOKEN=
-ENV NODE_ENV=production
 
 ENV LOGSTASH_HOST=logstash.development
 ENV LOGSTASH_PORT=8080
@@ -60,6 +61,9 @@ ENV DB_URL=http://arango.development:8529
 ENV DB_NAME=networkmap
 ENV DB_USER=root
 ENV DB_PASSWORD=
+
+ENV CONFIG_DATABASE=Configuration
+ENV CONFIG_COLLECTION=configuration
 
 HEALTHCHECK --interval=60s CMD [ -e /tmp/.lock ] || exit 1
 
