@@ -23,6 +23,7 @@ export class ArangoDBService implements iDBService {
   getNetworkMap(): Promise<any> {
     const networkConfigurationQuery = `
     FOR doc IN networkConfiguration
+    FILTER doc.active == true
     RETURN doc
   `;
     return this.query(networkConfigurationQuery);

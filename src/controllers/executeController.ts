@@ -3,7 +3,7 @@ import { handleTransaction } from '../services/logic.service';
 import { Context, Next } from 'koa';
 
 export const execute = async (ctx: Context, next: Next): Promise<void | Context> => {
-  let request  =  {};
+  let request = {};
   LoggerService.log('Start - Handle execute request');
 
   try {
