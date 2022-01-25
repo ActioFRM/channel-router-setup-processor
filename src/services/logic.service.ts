@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LoggerService } from './logger.service';
 import { NetworkMap, Rule } from '../classes/network-map';
 import axios from 'axios';
@@ -26,7 +27,7 @@ function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   return rules;
 }
 
-export const handleTransaction = async (req:any) => {
+export const handleTransaction = async (req: any) => {
   // Fetch the network map
   const networkConfigurationList = await dbService.getNetworkMap();
   if (networkConfigurationList && networkConfigurationList[0]) {
@@ -80,13 +81,7 @@ export const handleTransaction = async (req:any) => {
   }
 };
 
-const sendRuleToRuleProcessor = async (
-  rule: Rule,
-  networkMap: NetworkMap,
-  req: any,
-  sentTo: Array<string>,
-  failedRules: Array<string>,
-) => {
+const sendRuleToRuleProcessor = async (rule: Rule, networkMap: NetworkMap, req: any, sentTo: Array<string>, failedRules: Array<string>) => {
   const toSend = { transaction: req, networkMap };
   try {
     const ruleRes = await axios.post(`${rule.host}/execute`, toSend);
@@ -97,5 +92,6 @@ const sendRuleToRuleProcessor = async (
   } catch (error) {
     failedRules.push(rule.id);
     LoggerService.trace(`Failed to send to Rule ${rule.id}`);
+    LoggerService.error(`Failed to send to Rule ${rule.id} with Error: ${error}`);
   }
 };
