@@ -24,7 +24,7 @@ export class ArangoDBService implements iDBService {
     const networkConfigurationQuery = `
     FOR doc IN networkConfiguration
     FILTER doc.active == true
-    RETURN doc
+    RETURN UNSET(doc, ['_key', '_id', '_rev' ])
   `;
     return this.query(networkConfigurationQuery);
   }

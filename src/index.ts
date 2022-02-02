@@ -3,6 +3,8 @@ import apm from 'elastic-apm-node';
 import { LoggerService } from './services/logger.service';
 import App from './app';
 import { ArangoDBService } from './helpers/arango-client.service';
+import { RedisService } from './helpers/redis';
+
 import { iDBService } from './interfaces/iDBService';
 
 if (config.apmLogging) {
@@ -42,3 +44,4 @@ try {
 }
 
 export const dbService: iDBService = new ArangoDBService();
+export const cacheClient = new RedisService();
