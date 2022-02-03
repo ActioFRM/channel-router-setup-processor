@@ -4,6 +4,8 @@ export interface IConfig {
     db: string;
     host: string;
     port: number;
+    timeout:number
+
   };
   dbURL: string;
   dbName: string;

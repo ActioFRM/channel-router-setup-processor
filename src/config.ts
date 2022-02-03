@@ -13,6 +13,7 @@ export const config: IConfig = {
     db: <string>process.env.REDIS_DB,
     host: <string>process.env.REDIS_HOST,
     port: parseInt(process.env.REDIS_PORT!, 10),
+    timeout: parseInt(process.env.REDIS_TIMEOUT!, 10),
   },
   dbURL: <string>process.env.DB_URL,
   dbName: <string>process.env.DB_NAME,

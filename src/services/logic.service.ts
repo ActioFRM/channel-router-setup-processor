@@ -3,6 +3,7 @@ import { LoggerService } from './logger.service';
 import { NetworkMap, Rule } from '../classes/network-map';
 import axios from 'axios';
 import { dbService, cacheClient } from '..';
+import { config } from '../config';
 
 function getRuleMap(networkMap: NetworkMap, transactionType: string): Rule[] {
   const rules: Rule[] = new Array<Rule>();
@@ -45,7 +46,7 @@ export const handleTransaction = async (req: any) => {
     if (networkConfigurationList && networkConfigurationList[0]) {
       networkMap = networkConfigurationList[0][0];
       // save networkmap in redis cache
-      await cacheClient.setJson(cacheKey, JSON.stringify(networkMap), 'EX', 5);
+      await cacheClient.setJson(cacheKey, JSON.stringify(networkMap), 'EX', config.redis.timeout);
       prunedMap = networkMap.messages.filter((msg) => msg.txTp === req.TxTp);
 
     } else {
