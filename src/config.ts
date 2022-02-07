@@ -8,10 +8,13 @@ dotenv({
 });
 
 export const config: IConfig = {
-  redisDB: <string>process.env.REDIS_DB,
-  redisAuth: <string>process.env.REDIS_AUTH,
-  redisHost: <string>process.env.REDIS_HOST,
-  redisPort: parseInt(process.env.REDIS_PORT!, 10),
+  redis: {
+    auth: <string>process.env.REDIS_AUTH,
+    db: <string>process.env.REDIS_DB,
+    host: <string>process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT!, 10),
+    timeout: parseInt(process.env.REDIS_TIMEOUT!, 10),
+  },
   dbURL: <string>process.env.DB_URL,
   dbName: <string>process.env.DB_NAME,
   dbUser: <string>process.env.DB_USER,

@@ -1,8 +1,12 @@
 export interface IConfig {
-  redisDB: string;
-  redisAuth: string;
-  redisHost: string;
-  redisPort: number;
+  redis: {
+    auth: string;
+    db: string;
+    host: string;
+    port: number;
+    timeout:number
+
+  };
   dbURL: string;
   dbName: string;
   dbUser: string;

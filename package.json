@@ -26,6 +26,9 @@
     },
     {
       "name": "Theophilus Okwugwuni"
+    },
+    {
+      "name": "Uche Akogwu"
     }
   ],
   "license": "ISC",
@@ -41,7 +44,8 @@
     "koa": "2.13.1",
     "koa-bodyparser": "4.3.0",
     "koa-router": "10.0.0",
-    "log4js": "^6.3.0"
+    "log4js": "^6.3.0",
+    "redis": "^3.1.2"
   },
   "devDependencies": {
     "@types/async": "^3.2.5",
@@ -55,6 +59,7 @@
     "@types/node": "^14.14.25",
     "@types/node-fetch": "^2.5.8",
     "@types/redis": "^2.8.28",
+    "@types/redis-mock": "^0.17.1",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
     "eslint": "^7.19.0",
