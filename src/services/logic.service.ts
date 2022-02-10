@@ -35,20 +35,18 @@ export const handleTransaction = async (req: any) => {
   const cacheKey = `${req.TxTp}`;
   // check if there's an active network map in memory
   const activeNetworkMap = await cacheClient.getJson(cacheKey);
-  if(activeNetworkMap) {
+  if (activeNetworkMap) {
     cachedActiveNetworkMap = Object.assign(JSON.parse(activeNetworkMap));
     networkMap = cachedActiveNetworkMap;
     prunedMap = cachedActiveNetworkMap.messages.filter((msg) => msg.txTp === req.TxTp);
-
   } else {
-  // Fetch the network map from db
+    // Fetch the network map from db
     const networkConfigurationList = await dbService.getNetworkMap();
     if (networkConfigurationList && networkConfigurationList[0]) {
       networkMap = networkConfigurationList[0][0];
       // save networkmap in redis cache
       await cacheClient.setJson(cacheKey, JSON.stringify(networkMap), 'EX', config.redis.timeout);
       prunedMap = networkMap.messages.filter((msg) => msg.txTp === req.TxTp);
-
     } else {
       LoggerService.log('No network map found in DB');
       const result = {
@@ -61,8 +59,12 @@ export const handleTransaction = async (req: any) => {
     }
   }
   if (prunedMap && prunedMap[0]) {
-    const networkSubMap: NetworkMap = Object.assign(new NetworkMap(), { messages: prunedMap });
-    
+    const networkSubMap: NetworkMap = Object.assign(new NetworkMap(), {
+      active: networkMap.active,
+      cfg: networkMap.cfg,
+      messages: prunedMap,
+    });
+
     // Deduplicate all rules
     const rules = getRuleMap(networkMap, req.TxTp);
 
@@ -93,7 +95,6 @@ export const handleTransaction = async (req: any) => {
     };
     return result;
   }
-
 };
 
 const sendRuleToRuleProcessor = async (rule: Rule, networkMap: NetworkMap, req: any, sentTo: Array<string>, failedRules: Array<string>) => {
