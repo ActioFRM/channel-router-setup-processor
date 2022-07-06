@@ -34,15 +34,7 @@ export class RedisService {
 
   setJson = (key: string, value: string, event: string, time: number): Promise<string | undefined> =>
     new Promise((resolve) => {
-      if (time === 0)
-        this.client.SET(key, value, (err, res) => {
-          if (err) {
-            LoggerService.error('Error while setting key to redis with message:', err, 'RedisService');
-
-            resolve('');
-          }
-          resolve(res);
-        });
+      if (time === 0) resolve('');
       else
         this.client.SET(key, value, event, time, (err, res) => {
           if (err) {
