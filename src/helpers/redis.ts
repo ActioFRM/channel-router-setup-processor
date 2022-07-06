@@ -32,16 +32,26 @@ export class RedisService {
       });
     });
 
-  setJson = (key: string, value: string, event: string, time: number): Promise<string| undefined> =>
+  setJson = (key: string, value: string, event: string, time: number): Promise<string | undefined> =>
     new Promise((resolve) => {
-      this.client.SET(key, value, event, time, (err, res) => {
-        if (err) {
-          LoggerService.error('Error while setting key to redis with message:', err, 'RedisService');
+      if (time === 0)
+        this.client.SET(key, value, (err, res) => {
+          if (err) {
+            LoggerService.error('Error while setting key to redis with message:', err, 'RedisService');
 
-          resolve('');
-        }
-        resolve(res);
-      });
+            resolve('');
+          }
+          resolve(res);
+        });
+      else
+        this.client.SET(key, value, event, time, (err, res) => {
+          if (err) {
+            LoggerService.error('Error while setting key to redis with message:', err, 'RedisService');
+
+            resolve('');
+          }
+          resolve(res);
+        });
     });
 
   deleteKey = (key: string): Promise<number> =>
